@@ -16,12 +16,19 @@ void Grid::Draw()
 
 void Grid::SetValue(int row, int column, int value)
 {
-    cells[row][column] = value;
+    if(IsWithinBounds(row, column))
+    { 
+        cells[row][column] = value;
+    }
 }
 
 int Grid::GetValue(int row, int column)
 {
-    return cells[row][column];
+    if(IsWithinBounds(row, column))
+    { 
+        return cells[row][column];
+    }
+    return -1;
 }
 
 void Grid::FillRandom() {
@@ -29,7 +36,7 @@ void Grid::FillRandom() {
         for(int column = 0; column < columns; column++) {
             // Generate a random value between 0 and 9
             int randomValue = GetRandomValue(0, 4);
-            // If the random value is 4, set the cell to 1; otherwise, set it to 0.
+           
             cells[row][column] = (randomValue == 4) ? 1 : 0;
         }
     }
@@ -46,5 +53,13 @@ void Grid::Clear()
 
 void Grid::ToggleCell(int row, int column)
 {
-    cells[row][column] = !cells[row][column];
+    if(IsWithinBounds(row, column))
+    { 
+        cells[row][column] = !cells[row][column];
+    }
+}
+
+bool Grid::IsWithinBounds(int row, int column) const
+{
+     return row >= 0 && row < rows && column >= 0 && column < columns;
 }
