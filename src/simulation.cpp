@@ -1,6 +1,6 @@
-#include "simulation.hpp"
 #include <vector>
 #include <utility>
+#include "simulation.hpp"
 
 void Simulation::Draw()
 {
@@ -27,14 +27,52 @@ int Simulation::CountLiveNeighbors(int row, int column)
         {1, 1}   // Diagonal lower right
     };
 
-    for(const auto& offset: neighborOffsets)
+    for(const auto& offset : neighborOffsets)
     {
         int neighborRow = (row + offset.first + grid.GetRows()) % grid.GetRows();
         int neighborColumn = (column + offset.second + grid.GetColumns()) % grid.GetColumns();
         liveNeighbors += grid.GetValue(neighborRow, neighborColumn);
     }
-
     return liveNeighbors;
+}
+
+void Simulation::Update()
+{
+    if(IsRunning())
+    {
+        for(int row = 0; row < grid.GetRows(); row++)
+        {
+            for(int column = 0; column < grid.GetColumns(); column++)
+            {
+                int liveNeighbors = CountLiveNeighbors(row, column);
+                int cellValue = grid.GetValue(row, column);
+                
+                if(cellValue == 1)
+                {
+                    if(liveNeighbors > 3 || liveNeighbors < 2)
+                    {
+                        tempGrid.SetValue(row, column, 0);
+                    }
+                    else
+                    {
+                        tempGrid.SetValue(row, column, 1);
+                    }
+                }
+                else
+                {
+                    if(liveNeighbors == 3)
+                    {
+                        tempGrid.SetValue(row, column, 1);
+                    }
+                    else
+                    {
+                        tempGrid.SetValue(row, column, 0);
+                    }
+                }
+            }
+        }
+        grid = tempGrid;
+    }
 }
 
 void Simulation::ClearGrid()
@@ -53,42 +91,10 @@ void Simulation::CreateRandomState()
     }
 }
 
-void Simulation::Update()
+void Simulation::ToggleCell(int row, int column)
 {
-    if(IsRunning()) 
+    if(!IsRunning())
     {
-        for(int row = 0; row < grid.GetRows(); row++)
-        {
-            for(int column = 0; column < grid.GetColumns(); column++)
-            {
-                int live_neighbors = CountLiveNeighbors(row, column);
-                int cell_value = grid.GetValue(row, column);
-                if(cell_value == 1)
-                {
-                    if(live_neighbors > 3 || live_neighbors < 2)
-                    {
-                        temp_grid.SetValue(row, column, 0);
-                    }
-                    else
-                    {
-                        temp_grid.SetValue(row, column, 1);
-                    }
-                } 
-                else
-                {
-                    if(live_neighbors == 3)
-                    {
-                        temp_grid.SetValue(row, column, 1);
-                    }
-                    else
-                    {
-                        temp_grid.SetValue(row, column, 0);
-                    }
-                }
-            }
-        }
-
-        grid = temp_grid;
+        grid.ToggleCell(row, column);
     }
 }
-
